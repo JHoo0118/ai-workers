@@ -1,0 +1,14 @@
+.cache/
+__pycache__/
+/src/app/__pycache__/
+/src/tests/__pycache__/
+.pytest_cache
+venv/ 
+# Editor directories and files
+
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+.env
