@@ -42,9 +42,15 @@ const AIMenus: Menu[] = [
   },
   {
     id: "aic3",
-    title: "AI Code Converter",
+    title: "AI Code 변환",
     content: "변환할 코드와 언어를 선택하면 코드를 변경해 줍니다.",
     href: "/ai/codeconvert",
+  },
+  {
+    id: "aic4",
+    title: "AI Backend Code 생성  ",
+    content: "원하는대로 백엔드 코드를 생성해 줍니다.",
+    href: "/ai/apigen",
   },
 ];
 

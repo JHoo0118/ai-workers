@@ -2,27 +2,22 @@ import base64
 import os
 import json
 import zlib
-from fastapi import HTTPException, status
 import matplotlib.pyplot as plt
 import operator
 
 from typing import Dict, TypedDict, Annotated, Sequence
-from langchain_core.messages import BaseMessage
-
+from fastapi import HTTPException, status
 from langchain import hub
 from langgraph.graph import END, StateGraph
 from langchain.output_parsers.openai_tools import PydanticToolsParser
 from langchain.prompts import PromptTemplate
-from langchain_community.vectorstores.chroma import Chroma
-from langchain_core.messages import BaseMessage, FunctionMessage
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.pydantic_v1 import BaseModel, Field
-from langchain_core.runnables import RunnableLambda, RunnablePassthrough
 from langchain_core.utils.function_calling import convert_to_openai_tool
-from langchain_openai import ChatOpenAI, OpenAIEmbeddings
-from langchain_community.tools.sql_database.tool import QuerySQLCheckerTool
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_openai import ChatOpenAI
 from IPython.display import Image, display
+
+from app.model.ai.erd.ai_erd_model import ErdGenerateInputs
 
 
 class AIErdService(object):
@@ -210,7 +205,7 @@ class AIErdService(object):
             input_variables=["query"],
         )
         # LLM
-        llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0)
+        llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0, max_tokens=1000)
 
         # Chain
         rag_chain = prompt | llm | StrOutputParser()
@@ -347,8 +342,9 @@ class AIErdService(object):
             print("error existed.")
             return "yes"
 
-    async def invoke(self, email: str, inputs: dict[str, any]):
+    async def invoke(self, email: str, inputs: ErdGenerateInputs):
         self.__init_path(email=email)
+        pInputs = {"keys": inputs.model_dump()}
         workflow = StateGraph(self.GraphState)
 
         # Define the nodes
@@ -385,7 +381,7 @@ class AIErdService(object):
             # finally:
             #     self._callback.done.set()
             # await task
-            final_response = await app.ainvoke(inputs, {"recursion_limit": 10})
+            final_response = await app.ainvoke(pInputs, {"recursion_limit": 10})
             return final_response["keys"]["image"]
         except:
             raise HTTPException(
