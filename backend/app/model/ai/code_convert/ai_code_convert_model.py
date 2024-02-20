@@ -2,9 +2,10 @@ import json
 
 from openai import BaseModel
 from pydantic import Field
+from app.model.base_model import BaseSchema
 
 
-class CodeConvertGenerateInputs(BaseModel):
+class CodeConvertGenerateInputs(BaseSchema):
     code: str
     code_type: str
     target_code_type: str
