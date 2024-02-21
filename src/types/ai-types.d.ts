@@ -5,3 +5,7 @@ export type ErdGenereateOutputs = {
 export type CodeConvertGenereateOutputs = {
   result: string;
 };
+
+export type ApiGenGenerateOutputs = {
+  backendCode: string;
+};

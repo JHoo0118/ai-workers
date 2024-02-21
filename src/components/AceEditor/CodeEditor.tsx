@@ -44,6 +44,7 @@ interface CodeEditorProps {
   language: string;
   placeholder?: string;
   readOnly?: boolean;
+  height?: string;
 }
 
 const CodeEditor = ({
@@ -53,6 +54,7 @@ const CodeEditor = ({
   language,
   placeholder,
   readOnly = false,
+  height = "22rem",
 }: CodeEditorProps) => {
   const { theme, setTheme } = useTheme();
   return (
@@ -61,7 +63,7 @@ const CodeEditor = ({
       className={className}
       mode={language.toLowerCase()}
       width="100%"
-      height="22rem"
+      height={height}
       theme={theme === "dark" ? "tomorrow_night_eighties" : "chrome"}
       name="UNIQUE_ID_OF_DIV"
       value={value}

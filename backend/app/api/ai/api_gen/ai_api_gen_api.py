@@ -3,7 +3,6 @@ from typing import Annotated
 
 from app.model.user.user_model import UserModel
 from app.service.auth.jwt_bearer import JwtBearer
-from app.service.ai.erd.ai_erd_service import AIErdService
 from app.model.ai.api_gen.ai_api_gen_model import ApiGenerateInputs, ApiGenerateOutputs
 from app.service.ai.api_gen.ai_api_gen_service import AIApiGenService
 

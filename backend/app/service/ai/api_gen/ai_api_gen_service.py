@@ -84,9 +84,9 @@ class AIApiGenService(object):
             input_variables=["input"],
         )
 
-        # LLM
-        # llm = ChatOpenAI(model_name="gpt-4-0125-preview", temperature=0)
-        llm = ChatOllama(model="mistral:latest")
+        # LLM gpt-4-0125-preview
+        llm = ChatOpenAI(model_name="gpt-4", temperature=0)
+        # llm = ChatOllama(model="mistral:latest")
 
         # Chain
         rag_chain = prompt | llm | StrOutputParser()
@@ -146,8 +146,8 @@ class AIApiGenService(object):
         )
 
         # LLM
-        # llm = ChatOpenAI(model_name="gpt-4-0125-preview", temperature=0)
-        llm = ChatOllama(model="mistral:latest")
+        llm = ChatOpenAI(model_name="gpt-4", temperature=0)
+        # llm = ChatOllama(model="mistral:latest")
 
         # Chain
         rag_chain = prompt | llm | StrOutputParser()
@@ -203,13 +203,14 @@ class AIApiGenService(object):
             Based on the self-evaluation, refine the prompt or generated code to better meet the project requirements, improve code quality, or enhance security and performance.
 
             IMPORATNT: Print ONLY the code, nothing else.
+            IMPORATNT: Output only plain text. Do not output markdown.
             IMPORTANT: Write functions that make sense for the users request if required.
             """,
             input_variables=["input", "framework", "project_scope"],
         )
         # LLM
-        # llm = ChatOpenAI(model_name="gpt-4-0125-preview", temperature=0)
-        llm = ChatOllama(model="mistral:latest")
+        llm = ChatOpenAI(model_name="gpt-4", temperature=0)
+        # llm = ChatOllama(model="mistral:latest")
 
         # Chain
         rag_chain = prompt | llm | StrOutputParser()

@@ -1,4 +1,4 @@
-from .erd import *
+from .diagram import *
 from .docs import *
 from .code_convert import *
 from .api_gen import *

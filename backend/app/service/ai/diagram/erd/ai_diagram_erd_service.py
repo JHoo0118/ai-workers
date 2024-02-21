@@ -17,10 +17,10 @@ from langchain_core.utils.function_calling import convert_to_openai_tool
 from langchain_openai import ChatOpenAI
 from IPython.display import Image, display
 
-from app.model.ai.erd.ai_erd_model import ErdGenerateInputs
+from app.model.ai.diagram.erd.ai_diagram_erd_model import ErdGenerateInputs
 
 
-class AIErdService(object):
+class AIDiagramErdService(object):
     _instance = None
 
     class GraphState(TypedDict):

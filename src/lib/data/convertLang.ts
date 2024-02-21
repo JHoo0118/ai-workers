@@ -33,14 +33,14 @@ export const lang: { label: string; value: string }[] = [
   },
   {
     label: "C#",
-    value: "c#",
+    value: "csharp",
   },
   {
     label: "Kotlin",
     value: "kotlin",
   },
   {
-    label: "SWift",
+    label: "Swift",
     value: "swift",
   },
   {

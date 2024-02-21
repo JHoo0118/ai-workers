@@ -2,12 +2,9 @@ import json
 from openai import BaseModel
 from pydantic import Field
 
-from app.model.base_model import BaseSchema
 
-
-class ApiGenerateInputs(BaseModel):
-    input: str
-    framework: str
+class SeqDiagramGenerateInputs(BaseModel):
+    request: str
 
     @classmethod
     def __get_validators__(cls):
@@ -20,5 +17,5 @@ class ApiGenerateInputs(BaseModel):
         return value
 
 
-class ApiGenerateOutputs(BaseSchema):
-    backend_code: str = Field("생성된 백엔드 코드")
+class SeqDiagramGenerateOutputs(BaseModel):
+    image: str = Field("생성된 Sequence Diagram 이미지")

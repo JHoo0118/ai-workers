@@ -1,3 +1,4 @@
+import AIApiGenContainer from "@/components/AI/ApiGen/AIApiGenContainer";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -5,7 +6,7 @@ export const metadata: Metadata = {
 };
 
 function AIApiGenPage() {
-  return <div></div>
+  return <AIApiGenContainer />;
 }
 
 export default AIApiGenPage;

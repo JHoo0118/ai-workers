@@ -2,7 +2,7 @@ import { fetchInterceptors } from "@/lib/utils/fetch";
 import {
   CodeConvertSchema,
   codeConvertSchema,
-} from "@/lib/validation/ai/codeConverter/codeConverter";
+} from "@/lib/validation/ai/codeConverter/codeConverterSchema";
 import { CodeConvertGenereateOutputs } from "@/types/ai-types";
 
 export async function codeConvertGenerate(

@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/select";
 import useMenu from "@/hooks/useMenu";
 import { lang } from "@/lib/data/convertLang";
-import { codeConvertSchema } from "@/lib/validation/ai/codeConverter/codeConverter";
+import { codeConvertSchema } from "@/lib/validation/ai/codeConverter/codeConverterSchema";
 import { codeConvertGenerate } from "@/service/ai/codeConvert/codeConvert";
 import { CodeConvertGenereateOutputs } from "@/types/ai-types";
 import { zodResolver } from "@hookform/resolvers/zod";
