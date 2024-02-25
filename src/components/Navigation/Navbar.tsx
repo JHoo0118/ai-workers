@@ -6,14 +6,12 @@ import Link from "next/link";
 import ThemeToggleButton from "../Button/ThemeToggleButton";
 import Logo from "../Logo/Logo";
 import { Button } from "../ui/button";
+import { DropdownIcon } from "./DropdownIcon";
 import NavItem from "./NavItem";
 
 export default function Navbar() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
 
-  async function onLogout() {
-    await logout();
-  }
   return (
     <div className="flex h-nav flex-1 items-center justify-between px-6">
       <Logo />
@@ -25,9 +23,7 @@ export default function Navbar() {
         </ul>
         {user ? (
           <div className="flex items-center justify-center">
-            <Button className="mr-4" onClick={onLogout}>
-              로그아웃
-            </Button>
+            <DropdownIcon />
             <ThemeToggleButton />
           </div>
         ) : (

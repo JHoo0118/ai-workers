@@ -2,7 +2,7 @@ import AIDocsSummaryContainer from "@/components/AI/Docs/AIDocsSummaryContainer"
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "AI 문서 요약",
+  title: "AI 문서 요약 & 질문",
 };
 
 function AIDocsSummaryPage() {

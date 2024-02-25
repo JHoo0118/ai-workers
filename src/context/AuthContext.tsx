@@ -46,11 +46,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     } else {
       setUser(JSON.parse(localStorage.getItem(USER)!));
     }
-    // if (!hasCookie(ACCESS_TOKEN)) {
-    //   getUser();
-    // } else if (localStorage.getItem(USER) != null) {
-    //   setUser(JSON.parse(localStorage.getItem(USER)!));
-    // }
+
+    if (!hasCookie(ACCESS_TOKEN)) {
+      deleteTokens();
+    }
   }, []);
 
   const getUser = async () => {

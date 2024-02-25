@@ -36,12 +36,12 @@ class AIDiagramSeqDiagramService(object):
         if not os.path.exists("./backend/.cache"):
             os.makedirs("./backend/.cache")
 
-        if not os.path.exists("./backend/.cache/erd"):
-            os.makedirs("./backend/.cache/erd")
+        if not os.path.exists("./backend/.cache/seq_diagram"):
+            os.makedirs("./backend/.cache/seq_diagram")
 
     def __init_path(self, email: str):
-        if not os.path.exists(f"./backend/.cache/erd/{email}"):
-            os.makedirs(f"./backend/.cache/erd/{email}")
+        if not os.path.exists(f"./backend/.cache/seq_diagram/{email}"):
+            os.makedirs(f"./backend/.cache/seq_diagram/{email}")
 
     ### Nodes ###
     def summarize_user_request(self, state):

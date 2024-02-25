@@ -75,14 +75,6 @@ function DragAndDropAIDocsSummaryFile({
   function onStop() {
     setIsStreaming(false);
     stop();
-    // setMessages([
-    //   ...messages,
-    //   {
-    //     id: uuidv4(),
-    //     role: "user",
-    //     content: input,
-    //   },
-    // ]);
   }
 
   const {
@@ -128,7 +120,6 @@ function DragAndDropAIDocsSummaryFile({
     }
   }, [completedFile, initialMessages, setMessages]);
 
-  const formRef = useRef<HTMLFormElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const lastMessageIsUser = messages[messages.length - 1]?.role === "user";

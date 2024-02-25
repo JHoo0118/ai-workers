@@ -14,3 +14,18 @@ export async function docsSummary(file: File) {
     isRequiredAccessToken: true,
   });
 }
+
+export async function docsSummaryAgent(file: File) {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  return fetchInterceptors({
+    url: "/py-api/ai/docs/summary/agent",
+    options: {
+      method: "POST",
+      body: formData,
+    },
+    isMultipart: true,
+    isRequiredAccessToken: true,
+  });
+}

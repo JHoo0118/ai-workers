@@ -5,7 +5,7 @@ from typing import List
 from app.model.ai.ai_model import ChatModel
 
 
-class DocsSummaryAsk(BaseModel):
+class DocsSummaryAskInputs(BaseModel):
     messages: List[ChatModel]
 
     @classmethod
@@ -17,3 +17,7 @@ class DocsSummaryAsk(BaseModel):
         if isinstance(value, str):
             return cls(**json.loads(value))
         return value
+
+
+class DocsSummaryAskOutputs(BaseModel):
+    result: str

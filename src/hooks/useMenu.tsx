@@ -3,5 +3,5 @@ import { usePathname } from "next/navigation";
 
 export default function useMenu() {
   const pathname = usePathname();
-  return gridMenus.find((menu: Menu) => pathname.indexOf(menu.href) !== -1)!;
+  return gridMenus.find((menu: Menu) => pathname === menu.href)!;
 }

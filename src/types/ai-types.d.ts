@@ -9,3 +9,9 @@ export type CodeConvertGenereateOutputs = {
 export type ApiGenGenerateOutputs = {
   backendCode: string;
 };
+
+export type SeqDiagramGenerateOutputs = ErdGenereateOutputs;
+
+export type SqlToEntityOutputs = {
+  result: string;
+};

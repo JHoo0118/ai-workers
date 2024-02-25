@@ -11,9 +11,9 @@ export default function GridMenuItem({
 }: GridMenuItemProps) {
   return (
     <Link href={href}>
-      <Card className="min-h-60 bg-gray-100 dark:bg-card">
+      <Card className="flex min-h-60 flex-col justify-between bg-gray-100 dark:bg-card">
         <CardHeader>
-          <CardTitle className="line-clamp-2">{title}</CardTitle>
+          <CardTitle className="line-clamp-3">{title}</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="whitespace-pre-line">{content}</p>

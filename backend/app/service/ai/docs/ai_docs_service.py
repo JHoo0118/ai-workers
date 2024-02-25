@@ -223,7 +223,6 @@ class AIDocsService(object):
         response = ""
         async for token in chain.astream(input=message):
             yield token
-            print(token, end="|", flush=True)
             response += token
 
     # async def generator(self, chain: RunnableSerializable, message):

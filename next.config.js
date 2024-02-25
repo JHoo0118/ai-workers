@@ -1,6 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: false,
+  experimental: {
+    proxyTimeout: 1000 * 120,
+  },
   httpAgentOptions: {
     keepAlive: true,
   },

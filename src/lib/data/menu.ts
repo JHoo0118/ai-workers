@@ -26,32 +26,73 @@ const pdfMenus: Menu[] = [
   },
 ];
 
-const AIMenus: Menu[] = [
+const AIDocsMenus: Menu[] = [
   {
-    id: "aic1",
-    title: "AI 문서 요약",
+    id: "aidocsc1",
+    title: "AI 문서 요약 & 질문",
     content:
       "AI가 원하는 문서를 요약해 줍니다. AI에게 요약된 문서에 대해 질문해 보세요.",
     href: "/ai/docs/summary",
   },
   {
-    id: "aic2",
+    id: "aidocsc2",
+    title: "AI 문서 요약 & 질문 (Agent)",
+    content:
+      "문서 요약 Agent가 원하는 문서를 요약해 줍니다. 요약된 문서에 대해 질문해 보세요.",
+    href: "/ai/docs/summary-agent",
+  },
+];
+
+const AIDiagramsMenus: Menu[] = [
+  {
+    id: "aidiagramsc1",
     title: "AI ERD 이미지 생성",
     content: "DDL, DML문을 작성하시면 ERD 이미지를 생성합니다.",
-    href: "/ai/erd",
+    href: "/ai/diagram/erd",
   },
   {
-    id: "aic3",
+    id: "aidiagramsc2",
+    title: "AI Sequence Diagram 이미지 생성  ",
+    content: "주어진 상황에 맞는 Sequence Diagram을 생성합니다.",
+    href: "/ai/diagram/seq",
+  },
+];
+
+const AICodeMenus: Menu[] = [
+  {
+    id: "aicodec1",
     title: "AI Code 변환",
     content: "변환할 코드와 언어를 선택하면 코드를 변경해 줍니다.",
-    href: "/ai/codeconvert",
+    href: "/ai/code/codeconvert",
   },
   {
-    id: "aic4",
+    id: "aicodec2",
     title: "AI Backend Code 생성  ",
     content: "원하는대로 백엔드 코드를 생성해 줍니다.",
-    href: "/ai/apigen",
+    href: "/ai/code/apigen",
   },
+  {
+    id: "aicodec3",
+    title: "AI Entity Code 생성  ",
+    content: "SQL문을 입력하시면 Entity Code를 생성해 줍니다.",
+    href: "/ai/code/sqlentity",
+  },
+];
+
+const AIDbMenus: Menu[] = [
+  {
+    id: "aidbc1",
+    title: "AI DB 설계 및 디자인",
+    content: "원하는대로 DB 설계 및 디자인을 해 줍니다. ",
+    href: "/ai/db/sql",
+  },
+];
+
+const AIMenus: Menu[] = [
+  ...AIDocsMenus,
+  ...AIDiagramsMenus,
+  ...AICodeMenus,
+  ...AIDbMenus,
 ];
 
 export const gridMenus: Menu[] = [...pdfMenus, ...AIMenus];
@@ -67,10 +108,34 @@ export const menus: Menu[] = [
   },
   {
     id: "ai1",
-    title: "AI",
-    content: "AI",
+    title: "AI Documents",
+    content: "AI Documents",
     href: "/ai/docs/summary",
     type: "dropdown",
-    children: [...AIMenus],
+    children: [...AIDocsMenus],
+  },
+  {
+    id: "ai2",
+    title: "AI Diagrams",
+    content: "AI Diagrams",
+    href: "/ai/diagram/erd",
+    type: "dropdown",
+    children: [...AIDiagramsMenus],
+  },
+  {
+    id: "ai3",
+    title: "AI Codes",
+    content: "AI Codes",
+    href: "/ai/code/codeconvert",
+    type: "dropdown",
+    children: [...AICodeMenus],
+  },
+  {
+    id: "ai4",
+    title: "AI DB",
+    content: "AI DB",
+    href: "/ai/db/sql",
+    type: "dropdown",
+    children: [...AIDbMenus],
   },
 ];

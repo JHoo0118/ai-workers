@@ -2,6 +2,7 @@ import { cn } from "@/lib/utils/utils";
 import { Message } from "ai/react";
 
 import { BotIcon, UserIcon } from "lucide-react";
+import MarkdownRenderer from "../Markdown/MarkdownRenderer";
 
 export default function ChatMessage({
   message: { role, content },
@@ -51,7 +52,9 @@ export default function ChatMessage({
           <span className="block font-bold">
             {isAiMessage ? "AI Workers 봇" : "나"}
           </span>
-          <p className="whitespace-pre-line break-all text-left">{content}</p>
+          <p className="whitespace-pre-line break-all text-left">
+            <MarkdownRenderer markdown={content} />
+          </p>
         </div>
       )}
     </div>
