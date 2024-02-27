@@ -84,7 +84,7 @@ function AIDBSqlContainer({}: AIDBSqlContainerProps) {
       {
         id: "0",
         role: "assistant",
-        content: "DB 설계 및 디자인 전문가입니다. 무엇을 도와드릴까요?",
+        content: "DB 전문가입니다. 무엇을 도와드릴까요?",
       },
     ]);
   }, [setMessages]);

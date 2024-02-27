@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import BaseModel, EmailStr, Field
 from prisma.models import User
 
@@ -13,4 +14,13 @@ class CreateUserInputs(BaseModel):
 
 
 class CreateUserOutputs(UserModel):
+    pass
+
+
+class UpdateUserInputs(BaseModel):
+    email: EmailStr = Field("Email")
+    username: Optional[str] = Field("Username")
+
+
+class UpdateUserOutputs(UserModel):
     pass

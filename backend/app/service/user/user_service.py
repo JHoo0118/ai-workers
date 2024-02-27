@@ -1,7 +1,7 @@
 from argon2 import PasswordHasher
 from argon2.exceptions import InvalidHashError, VerifyMismatchError
 from app.db.prisma import prisma
-from app.model.user.user_model import CreateUserInputs, UserModel
+from app.model.user.user_model import CreateUserInputs, UpdateUserInputs, UserModel
 
 
 class UserService(object):
@@ -30,6 +30,17 @@ class UserService(object):
             create_user_inputs.password = self.get_hash(create_user_inputs.password)
             user = transaction.user.create(data=create_user_inputs.model_dump())
             return user
+
+    async def update_user(self, update_user_inputs: UpdateUserInputs) -> UserModel:
+        user = prisma.user.update(
+            data={
+                "username": update_user_inputs.username,
+            },
+            where={
+                "email": update_user_inputs.email,
+            },
+        )
+        return user
 
     async def get_user(self, email: str) -> UserModel:
         return prisma.user.find_unique(

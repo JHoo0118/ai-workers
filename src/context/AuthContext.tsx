@@ -28,6 +28,7 @@ interface AuthContextType {
   signup: (signupSchemaInputs: SignupSchema) => Promise<void>;
   login: (loginSchemaInputs: LoginSchema, forwardUrl?: string) => Promise<void>;
   logout: () => Promise<void>;
+  renewalUser: (user: UserModel) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -59,15 +60,19 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       if (!user) {
         return;
       }
-      setUser(user);
-
-      const simpleUser: SimpleUser = {
-        email: user.email,
-        username: user.username,
-      };
-
-      localStorage.setItem(USER, JSON.stringify(simpleUser));
+      renewalUser(user);
     }
+  };
+
+  const renewalUser = (user: UserModel) => {
+    setUser(user);
+
+    const simpleUser: SimpleUser = {
+      email: user.email,
+      username: user.username,
+    };
+
+    localStorage.setItem(USER, JSON.stringify(simpleUser));
   };
 
   const signup = async (signupSchemaInputs: SignupSchema) => {
@@ -114,6 +119,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         signup,
         login,
         logout,
+        renewalUser,
       }}
     >
       {children}

@@ -7,8 +7,12 @@ import Navbar from "../Navigation/Navbar";
 
 export default function MainHeader() {
   const pathname = usePathname();
-  const doNotShowHeaders = ["/login", "/signup"];
-  const showHeader = doNotShowHeaders.includes(pathname) ? false : true;
+  const doNotShowHeaders = ["/login", "/signup", "/account"];
+  const showHeader = doNotShowHeaders.some((path: string) =>
+    pathname.includes(path),
+  )
+    ? false
+    : true;
   return (
     <header
       className={cn(
