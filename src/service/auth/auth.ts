@@ -8,6 +8,7 @@ import {
 } from "@/lib/validation/refreshTokensSchema";
 import { SignupSchema, signupSchema } from "@/lib/validation/signupSchema";
 import {
+  GoogleLoginOutputs,
   LoginInputs,
   LoginOutputs,
   RefreshTokensOutputs,
@@ -131,3 +132,12 @@ export async function refreshTokens(): Promise<RefreshTokensOutputs> {
     throw error?.message || "오류가 발생했습니다.";
   }
 }
+
+export const googleLogin = async (): Promise<GoogleLoginOutputs> => {
+  return fetchInterceptors({
+    url: "/py-api/auth/login/google",
+    options: {
+      method: "GET",
+    },
+  });
+};

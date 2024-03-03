@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "DownloadLog" ALTER COLUMN "downloadDate" SET DEFAULT CURRENT_TIMESTAMP;

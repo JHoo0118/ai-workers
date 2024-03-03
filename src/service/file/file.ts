@@ -1,11 +1,11 @@
 import { ReturnType, fetchInterceptors } from "@/lib/utils/fetch";
 import { FileDonwloadInputs } from "@/types/file-types";
 
-export async function fileDelete({
+export async function filePublicDelete({
   filename,
 }: FileDonwloadInputs): Promise<boolean> {
   return fetchInterceptors({
-    url: `/py-api/file/delete/${filename}`,
+    url: `/py-api/file/public/delete/${filename}`,
     options: {
       method: "DELETE",
     },

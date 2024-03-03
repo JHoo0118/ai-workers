@@ -29,7 +29,7 @@ export default function RootLayout({
         <AuthProvider>
           <ThemeProvider attribute="class">
             <MainHeader />
-            <main className="flex w-full justify-center">
+            <main className="w-full">
               <Toaster position="top-center" />
               <SWRConfigContext>{children}</SWRConfigContext>
             </main>

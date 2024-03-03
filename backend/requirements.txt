@@ -27,6 +27,7 @@ dataclasses-json-speakeasy==0.5.11
 debugpy==1.8.1
 decorator==5.1.1
 Deprecated==1.2.14
+deprecation==2.1.0
 distro==1.9.0
 dnspython==2.5.0
 ecdsa==0.18.0
@@ -44,9 +45,10 @@ flatbuffers==23.5.26
 fonttools==4.48.1
 frozenlist==1.4.1
 fsspec==2024.2.0
+gotrue==2.4.1
 h11==0.14.0
 httpcore==1.0.2
-httpx==0.26.0
+httpx==0.25.2
 huggingface-hub==0.20.3
 humanfriendly==10.0
 idna==3.6
@@ -108,6 +110,7 @@ pillow==10.2.0
 pillow_heif==0.15.0
 platformdirs==4.2.0
 portalocker==2.8.2
+postgrest==0.16.1
 prisma==0.12.0
 prompt-toolkit==3.0.43
 protobuf==4.25.2
@@ -140,6 +143,7 @@ pytz==2024.1
 PyYAML==6.0.1
 pyzmq==25.1.2
 rapidfuzz==3.6.1
+realtime==1.0.2
 regex==2023.12.25
 requests==2.31.0
 rsa==4.9
@@ -151,6 +155,10 @@ soupsieve==2.5
 SQLAlchemy==2.0.26
 stack-data==0.6.3
 starlette==0.36.3
+storage3==0.7.0
+StrEnum==0.4.15
+supabase==2.4.0
+supafunc==0.3.3
 sympy==1.12
 tabulate==0.9.0
 tenacity==8.2.3
@@ -176,6 +184,7 @@ unstructured.pytesseract==0.3.12
 urllib3==2.2.0
 uvicorn==0.27.1
 wcwidth==0.2.13
+websockets==11.0.3
 wrapt==1.16.0
 xlrd==2.0.1
 XlsxWriter==3.1.9

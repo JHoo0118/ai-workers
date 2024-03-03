@@ -1,6 +1,10 @@
+import os
+import requests
 from fastapi import HTTPException, status, Depends
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from typing import Annotated
+from prisma.models import User
+from prisma.errors import UniqueViolationError
 
 from app.db.prisma import prisma
 from app.model.auth.auth_model import (
@@ -12,10 +16,15 @@ from app.model.auth.auth_model import (
 from app.model.user.user_model import UserModel
 from app.service.auth.jwt_service import JwtService
 from app.service.user.user_service import UserService
-from prisma.models import User
-from prisma.errors import UniqueViolationError
+
+from app.const.const import SIGNUP_TYPE_GOOGLE
+from app.db.supabase import SupbaseService
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/login")
+
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
+GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
+GOOGLE_REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI")
 
 
 class AuthService(object):
@@ -23,6 +32,7 @@ class AuthService(object):
 
     _jwtService: JwtService = None
     _userService: UserService = None
+    _supabaseService: SupbaseService = None
 
     def __new__(class_, *args, **kwargs):
         if not isinstance(class_._instance, class_):
@@ -33,6 +43,7 @@ class AuthService(object):
     def __init__(self) -> None:
         self._jwtService = JwtService()
         self._userService = UserService()
+        self._supabaseService = SupbaseService()
 
     async def authenticate_user(self, email: str, password: str) -> UserModel:
         user = await self._userService.get_user(email)
@@ -95,6 +106,63 @@ class AuthService(object):
             access_token=access_token,
             refresh_token=refresh_token,
         )
+
+    def login_google(self) -> str:
+        return f"https://accounts.google.com/o/oauth2/auth?response_type=code&client_id={GOOGLE_CLIENT_ID}&redirect_uri={GOOGLE_REDIRECT_URI}&scope=openid%20profile%20email&access_type=offline"
+
+    async def callback_google(self, code: str) -> LogInOutputs:
+        forbbiden_exception = HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="인증에 실패했습니다.",
+        )
+        try:
+            token_url = "https://accounts.google.com/o/oauth2/token"
+            data = {
+                "code": code,
+                "client_id": GOOGLE_CLIENT_ID,
+                "client_secret": GOOGLE_CLIENT_SECRET,
+                "redirect_uri": GOOGLE_REDIRECT_URI,
+                "grant_type": "authorization_code",
+                "scope": [
+                    # "https://www.googleapis.com/auth/userinfo.profile",
+                    "https://www.googleapis.com/auth/userinfo.email",
+                    "openid",
+                ],
+            }
+            response = requests.post(token_url, data=data)
+            access_token = response.json().get("access_token")
+            if access_token is None:
+                raise forbbiden_exception
+            user_info = requests.get(
+                "https://www.googleapis.com/oauth2/v1/userinfo",
+                headers={"Authorization": f"Bearer {access_token}"},
+            )
+            user_info_json: dict = user_info.json()
+            email = user_info_json.get("email")
+            with prisma.tx() as transaction:
+                user: User = transaction.user.find_unique(where={"email": email})
+                if user is None:
+                    transaction.user.create(
+                        data={
+                            "email": email,
+                            "username": email,
+                            "type": SIGNUP_TYPE_GOOGLE,
+                        }
+                    )
+                access_token, refresh_token = self._jwtService.get_tokens(
+                    data={"sub": email},
+                )
+
+            await self.update_rt_hash(email=user.email, rt=refresh_token)
+
+            return LogInOutputs(
+                access_token=access_token,
+                refresh_token=refresh_token,
+            )
+
+        except Exception as e:
+            print(e)
+            raise forbbiden_exception
 
     async def sign_up(self, sign_up_inputs: SignUpInputs) -> SignUpOutputs:
         try:

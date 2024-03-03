@@ -7,6 +7,10 @@ class LogInOutputs(BaseSchema):
     refresh_token: str = Field()
 
 
+class LoginGoogleOutputs(BaseModel):
+    url: str = Field("url")
+
+
 class SignUpInputs(BaseModel):
     email: EmailStr = Field("Email")
     password: str = Field("Password")

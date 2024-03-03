@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { decodeURIComponentHelper } from "@/lib/utils/utils";
-import { fileDelete, fileDonwload } from "@/service/file/file";
+import { fileDonwload, filePublicDelete } from "@/service/file/file";
 import { IsFileExistOutputs } from "@/types/file-types";
 import { ArrowLeftCircle, Download, Trash2Icon } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -27,7 +27,7 @@ export default function PdfMergeResultPage({
   }
 
   async function onClickDeleteButton() {
-    toast.promise(fileDelete({ filename }), {
+    toast.promise(filePublicDelete({ filename }), {
       loading: "삭제 중...",
       success: (result: boolean) => {
         onClickBackButton();

@@ -1,14 +1,19 @@
 import logging
 
-from app.db.prisma import prisma
-from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from dotenv import load_dotenv
-from app.api import api
-from app.middleware import RouterLoggingMiddleware
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from app.api import api
+from app.db.prisma import prisma
+from app.middleware import RouterLoggingMiddleware
+
+from app.db.supabase import SupbaseService
+
 
 load_dotenv()
+
+SupbaseService()
 
 
 @asynccontextmanager

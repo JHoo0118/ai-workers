@@ -41,6 +41,18 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<UserModel | undefined>(undefined);
   const router = useRouter();
 
+  const getUser = useCallback(async () => {
+    console.log(hasCookie(ACCESS_TOKEN));
+    if (hasCookie(ACCESS_TOKEN)) {
+      const user = await getMe();
+
+      if (!user) {
+        return;
+      }
+      renewalUser(user);
+    }
+  }, []);
+
   useEffect(() => {
     if (localStorage.getItem(USER) === null) {
       getUser();
@@ -51,18 +63,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     if (!hasCookie(ACCESS_TOKEN)) {
       deleteTokens();
     }
-  }, []);
-
-  const getUser = async () => {
-    if (hasCookie(ACCESS_TOKEN)) {
-      const user = await getMe();
-
-      if (!user) {
-        return;
-      }
-      renewalUser(user);
-    }
-  };
+  }, [getUser]);
 
   const renewalUser = (user: UserModel) => {
     setUser(user);
@@ -83,7 +84,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       },
       error: (error) => <b>{error}</b>,
     });
-    router.push("/");
+    router.replace("/");
     await getUser();
   };
 

@@ -12,6 +12,10 @@ export type LoginInputs = {
 };
 export type LoginOutputs = Pick<SignupOutputs, "accessToken", "refreshToken">;
 
+export type GoogleLoginOutputs = {
+  url: string;
+};
+
 export type RefreshTokensOutputs = Pick<
   SignupOutputs,
   "accessToken",

@@ -1,5 +1,8 @@
 file_output_dir: dict[str, str] = {
-    "pdf": "outputs/pdf",
-    "tmp": "outputs/tmp",
-    "docx": "outputs/docx",
+    "anon_pdf": "public/pdf",
+    "anon_docx": "public/docx",
+    "tmp": "tmp_files",
 }
+
+FILE_BUCKET_NAME = "Files"
+SIGNUP_TYPE_GOOGLE = "GOOGLE"

@@ -1,4 +1,4 @@
-import { CreditCard, LogOut, Settings, User } from "lucide-react";
+import { LogOut, User } from "lucide-react";
 
 import {
   DropdownMenu,
@@ -38,7 +38,7 @@ export function DropdownIcon() {
               <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
             </DropdownMenuItem>
           </Link>
-          <DropdownMenuItem className="cursor-pointer">
+          {/* <DropdownMenuItem className="cursor-pointer">
             <CreditCard className="mr-2 h-4 w-4" />
             <span>Billing</span>
             <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
@@ -47,7 +47,7 @@ export function DropdownIcon() {
             <Settings className="mr-2 h-4 w-4" />
             <span>Settings</span>
             <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
-          </DropdownMenuItem>
+          </DropdownMenuItem> */}
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         {/* <DropdownMenuGroup>
