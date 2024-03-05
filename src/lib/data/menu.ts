@@ -83,7 +83,7 @@ const AIDbMenus: Menu[] = [
   {
     id: "aidbc1",
     title: "AI DB 설계 및 디자인",
-    content: "원하는대로 DB 설계 및 디자인을 해 줍니다. ",
+    content: "원하는대로 DB 설계와 디자인을 도와줍니다. ",
     href: "/ai/db/sql",
   },
 ];

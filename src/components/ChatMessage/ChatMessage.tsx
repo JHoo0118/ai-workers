@@ -36,7 +36,6 @@ export default function ChatMessage({
           <UserIcon className="h-6 w-6" />
         )}
       </div>
-
       {!!isError ? (
         <div className="flex flex-row">
           <div className="mr-4 flex flex-col items-start justify-start">
@@ -53,7 +52,7 @@ export default function ChatMessage({
             {isAiMessage ? "AI Workers 봇" : "나"}
           </span>
           <p className="whitespace-pre-line break-all text-left">
-            <MarkdownRenderer markdown={content} />
+            <MarkdownRenderer content={content} />
           </p>
         </div>
       )}

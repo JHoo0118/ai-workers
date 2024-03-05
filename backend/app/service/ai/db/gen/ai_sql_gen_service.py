@@ -24,7 +24,7 @@ class AISqlGenService(object):
     def __init__(self):
         self._memory_llm = ChatOpenAI(
             temperature=0.1,
-            model="GPT-4 Turbo",
+            model="gpt-4",
         )
 
         self._memory = ConversationSummaryBufferMemory(

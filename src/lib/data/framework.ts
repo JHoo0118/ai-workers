@@ -30,8 +30,8 @@ export const framework: { label: string; value: string; lang: string }[] = [
     lang: "javascript",
   },
   {
-    label: "Nestjs",
-    value: "Nestjs",
+    label: "NestJs",
+    value: "NestJs",
     lang: "typescript",
   },
   {

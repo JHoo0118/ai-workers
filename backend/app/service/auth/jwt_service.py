@@ -46,8 +46,22 @@ class JwtService(object):
 
     async def verify_token(self, token: str, token_key: str) -> str:
         try:
-            payload = jwt.decode(token, token_key, algorithms=[self.algorithm])
-            email: str = payload.get("sub")
+            # print(token, token_key, self.algorithm)
+            payload = jwt.decode(
+                token,
+                key=token_key,
+                algorithms=[self.algorithm],
+                audience="authenticated",
+            )
+            # email: str = payload.get("sub")
+            # supabase
+            # user_metadata = payload.get("user_metadata", {})
+            # app_metadata = payload.get("app_metadata", {})
+            email = payload.get("email")
+            # super_id = payload.get("sub")
+            # provider = app_metadata.get("provider")
+            # username = user_metadata.get("username")
+            email: str = payload.get("email")
             if email is None:
                 raise self.credentials_exception
             return email

@@ -1,53 +1,46 @@
-// components/MarkdownRenderer.tsx
-import {
-  Fragment,
-  ReactElement,
-  createElement,
-  useEffect,
-  useState,
-} from "react";
-import * as prod from "react/jsx-runtime";
-import rehypeParse from "rehype-parse";
-import rehypeReact from "rehype-react";
-import { unified } from "unified";
+"use client";
 
-interface MarkdownRendererProps {
-  markdown: string;
+import ReactMarkdown from "react-markdown";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { oneDark } from "react-syntax-highlighter/dist/cjs/styles/prism";
+import remarkGfm from "remark-gfm";
+interface CodeProps {
+  node?: any;
+  inline?: any;
+  className?: any;
+  children?: any;
 }
+const markdownStyle = `prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto`;
 
-// @ts-expect-error: the react types are missing.
-const production = { Fragment: prod.Fragment, jsx: prod.jsx, jsxs: prod.jsxs };
-
-export default function MarkdownRenderer({
-  markdown,
-}: MarkdownRendererProps): ReactElement {
-  const [Content, setContent] = useState(createElement(Fragment));
-
-  useEffect(
-    function () {
-      (async function () {
-        const file = await unified()
-          .use(rehypeParse, { fragment: true })
-          .use(rehypeReact, production)
-          .process(markdown);
-
-        setContent(file.result);
-      })();
-    },
-    [markdown],
+const MarkdownRenderer = ({ content }: { content: string }) => {
+  return (
+    <div className={markdownStyle}>
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        components={{
+          code({ node, inline, className, children, ...props }: CodeProps) {
+            const match = /language-(\w+)/.exec(className || "");
+            return !inline && match ? (
+              <SyntaxHighlighter
+                {...props}
+                style={oneDark}
+                language={match[1]}
+                PreTag="div"
+              >
+                {String(children).replace(/\n$/, "")}
+              </SyntaxHighlighter>
+            ) : (
+              <code className={className} {...props}>
+                {children}
+              </code>
+            );
+          },
+        }}
+      >
+        {content}
+      </ReactMarkdown>
+    </div>
   );
+};
 
-  //   const Content = useMemo(() => {
-  //     // unified 프로세서 설정
-  //     const processor = unified()
-  //       .use(rehypeParse, { fragment: true }) // 마크다운을 파싱
-  //       .use(rehypeReact, production)
-
-  //     // 처리된 컨텐츠를 React 요소로 변환
-  //     const result = processor.processSync(markdown).result;
-
-  //     return result;
-  //   }, [markdown]);
-
-  return <>{Content}</>;
-}
+export default MarkdownRenderer;

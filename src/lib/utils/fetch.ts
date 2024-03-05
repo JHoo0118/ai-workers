@@ -70,7 +70,7 @@ export async function fetchInterceptors({
     }
 
     if (!res.ok) {
-      const errorResp = await res.json();
+      const errorResp = await res.json().catch((e) => "오류가 발생했습니다.");
       if (errorResp.hasOwnProperty("detail")) {
         throw new Error(
           typeof errorResp["detail"] === "string"

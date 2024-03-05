@@ -15,7 +15,6 @@ import { useAuth } from "@/context/AuthContext";
 import { LoginSchema, loginSchema } from "@/lib/validation/loginSchema";
 import { googleLogin } from "@/service/auth/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -74,7 +73,7 @@ const LoginPage = () => {
             >
               로그인
             </LoadingButton>
-            <div className="mt-4 flex items-center justify-between">
+            {/* <div className="mt-4 flex items-center justify-between">
               <div className="h-[1px] w-full bg-slate-200 dark:bg-slate-700"></div>
               <span className="min-w-12 text-center text-xs uppercase">
                 또는
@@ -96,7 +95,7 @@ const LoginPage = () => {
                 height="0"
               />
               <span>구글로 로그인</span>
-            </Button>
+            </Button> */}
           </form>
         </Form>
         <h3>

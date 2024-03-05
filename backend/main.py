@@ -17,7 +17,7 @@ if __name__ == "__main__":
         host=host,
         port=port,
         reload=True,
-        timeout_keep_alive=30,
+        timeout_keep_alive=180,
         server_header=False,
         headers=[("Connection", "Keep-Alive")],
     )

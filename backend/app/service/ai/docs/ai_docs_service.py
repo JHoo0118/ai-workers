@@ -15,8 +15,17 @@ from langchain.schema.runnable import RunnableLambda, RunnablePassthrough
 from langchain.schema import messages_to_dict, messages_from_dict
 from langchain.memory import ConversationSummaryBufferMemory
 from langchain_openai import ChatOpenAI
-from langchain.callbacks.streaming_aiter import AsyncIteratorCallbackHandler
 from langchain_core.output_parsers import StrOutputParser
+from langchain_community.vectorstores.supabase import SupabaseVectorStore
+from langchain.document_transformers.embeddings_redundant_filter import (
+    EmbeddingsRedundantFilter,
+)
+from langchain.retrievers.document_compressors import (
+    DocumentCompressorPipeline,
+    EmbeddingsFilter,
+)
+from langchain.retrievers.contextual_compression import ContextualCompressionRetriever
+from app.db.supabase import SupbaseService
 
 
 load_dotenv()
@@ -54,6 +63,7 @@ class AIDocsService(object):
     _memory_llm: ChatOpenAI
     _memory: ConversationSummaryBufferMemory
     _memory_file_path: str
+    _supabaseService: SupbaseService
 
     def __new__(class_, *args, **kwargs):
         if not isinstance(class_._instance, class_):
@@ -62,6 +72,7 @@ class AIDocsService(object):
         return class_._instance
 
     def __init__(self):
+        self._supabaseService = SupbaseService()
         self._memory_llm = ChatOpenAI(
             temperature=0.1,
             model="GPT-4 Turbo",
@@ -80,27 +91,21 @@ class AIDocsService(object):
         if not os.path.exists("./backend/.cache/docs"):
             os.makedirs("./backend/.cache/docs")
 
-        if not os.path.exists("./backend/.cache/docs/embeddings"):
-            os.makedirs("./backend/.cache/docs/embeddings")
-
-        if not os.path.exists("./backend/.cache/docs/files"):
-            os.makedirs("./backend/.cache/docs/files")
-
-        if not os.path.exists("./backend/.cache/docs/chat_memory"):
-            os.makedirs("./backend/.cache/docs/chat_memory")
-
     def __init_path(self, email: str, filename: str):
         self._memory_file_path = (
-            f"./backend/.cache/docs/chat_memory/{email}/{filename}_memory.json"
+            f"./backend/.cache/docs/{email}/chat_memory/{filename}_memory.json"
         )
-        if not os.path.exists(f"./backend/.cache/docs/embeddings/{email}"):
-            os.makedirs(f"./backend/.cache/docs/embeddings/{email}")
+        if not os.path.exists(f"./backend/.cache/docs/{email}"):
+            os.makedirs(f"./backend/.cache/docs/{email}")
 
-        if not os.path.exists(f"./backend/.cache/docs/files/{email}"):
-            os.makedirs(f"./backend/.cache/docs/files/{email}")
+        if not os.path.exists(f"./backend/.cache/docs/{email}/embeddings"):
+            os.makedirs(f"./backend/.cache/docs/{email}/embeddings")
 
-        if not os.path.exists(f"./backend/.cache/docs/chat_memory/{email}"):
-            os.makedirs(f"./backend/.cache/docs/chat_memory/{email}")
+        if not os.path.exists(f"./backend/.cache/docs/{email}/files/"):
+            os.makedirs(f"./backend/.cache/docs/{email}/files/")
+
+        if not os.path.exists(f"./backend/.cache/docs/{email}/chat_memory"):
+            os.makedirs(f"./backend/.cache/docs/{email}/chat_memory")
 
     def load_json(self, path):
         if not os.path.exists(path):
@@ -146,7 +151,7 @@ class AIDocsService(object):
         return "\n\n".join(doc.page_content for doc in docs)
 
     def get_file_path(self, email: str, filename: str):
-        return f"./backend/.cache/docs/files/{email}/{filename}"
+        return f"./backend/.cache/docs/{email}/files/{filename}"
 
     def embed_file(self, email: str, file: UploadFile):
         try:
@@ -171,7 +176,7 @@ class AIDocsService(object):
 
     def get_retriever(self, email: str, filename: str):
         cache_dir = LocalFileStore(
-            f"./backend/.cache/docs/embeddings/{email}/{filename}"
+            f"./backend/.cache/docs/{email}/embeddings/{filename}"
         )
         file_path = self.get_file_path(email=email, filename=filename)
         loader = UnstructuredFileLoader(file_path)
@@ -179,8 +184,20 @@ class AIDocsService(object):
         cached_embeddings = CacheBackedEmbeddings.from_bytes_store(
             embeddings, cache_dir
         )
-        vectorstore = FAISS.from_documents(docs, cached_embeddings)
+        # cached_embeddings = CacheBackedEmbeddings.from_bytes_store(
+        #     embeddings, InMemoryByteStore()
+        # )
+        # vectorstore = FAISS.from_documents(docs, cached_embeddings)
+        vectorstore = SupabaseVectorStore.from_documents(
+            docs,
+            cached_embeddings,
+            client=self._supabaseService.supabase,
+            table_name="Documents",
+            query_name="match_documents",
+            chunk_size=500,
+        )
         retriever = vectorstore.as_retriever()
+
         return retriever
 
     def restore_memory():
@@ -202,6 +219,16 @@ class AIDocsService(object):
         # invoke the chain
         parser = StrOutputParser()
         retriever = self.get_retriever(email=email, filename=filename)
+
+        # redundant_filter = EmbeddingsRedundantFilter(embeddings=embeddings)
+        # relevant_filter = EmbeddingsFilter(embeddings=embeddings, k=5)
+        # pipeline_compressor = DocumentCompressorPipeline(
+        #     transformers=[redundant_filter, relevant_filter]
+        # )
+        # compression_retriever_pipeline = ContextualCompressionRetriever(
+        #     base_retriever=retriever,
+        #     base_compressor=pipeline_compressor,
+        # )
         chain = (
             {
                 "context": retriever | RunnableLambda(self.format_docs),

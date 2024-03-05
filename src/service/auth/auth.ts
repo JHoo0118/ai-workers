@@ -93,7 +93,7 @@ export async function refreshTokens(): Promise<RefreshTokensOutputs> {
   }
 
   const accessToken = getCookie(ACCESS_TOKEN)!;
-  const email = decodeJwt(accessToken).sub!;
+  const { email } = decodeJwt(accessToken)! as any;
 
   const refreshTokensSchemaInputs: RefreshTokensSchema = {
     email,

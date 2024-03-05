@@ -10,6 +10,8 @@ from app.middleware import RouterLoggingMiddleware
 
 from app.db.supabase import SupbaseService
 
+from app.service.scheduler.scheduler_service import SchedulerService
+
 
 load_dotenv()
 
@@ -20,6 +22,7 @@ SupbaseService()
 async def lifespan(_: FastAPI):
     try:
         prisma.connect()
+        SchedulerService().start()
         yield
     finally:
         prisma.disconnect()

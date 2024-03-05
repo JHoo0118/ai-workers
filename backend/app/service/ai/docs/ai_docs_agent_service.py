@@ -2,9 +2,12 @@ import asyncio
 import os
 import json
 import operator
+import json
 
+from pyparsing import Any
+from typing import Dict, List, TypedDict
+from dotenv import load_dotenv
 from fastapi import UploadFile
-
 from langchain import hub
 from langchain.output_parsers.openai_tools import PydanticToolsParser
 from langchain.prompts import PromptTemplate
@@ -18,18 +21,13 @@ from langchain.embeddings import CacheBackedEmbeddings
 from langchain.storage import LocalFileStore
 from langchain.memory import ConversationSummaryBufferMemory
 from langchain.text_splitter import CharacterTextSplitter
-from langchain.vectorstores.faiss import FAISS
 from langchain_core.vectorstores import VectorStoreRetriever
-from langchain.callbacks.base import BaseCallbackHandler
-from typing import Dict, List, TypedDict
-from dotenv import load_dotenv
+from langchain_community.vectorstores.supabase import SupabaseVectorStore
 from langgraph.graph import END, StateGraph
 from langchain_core.messages.base import BaseMessage
 
 
-import json
-
-from pyparsing import Any
+from app.db.supabase import SupbaseService
 
 
 load_dotenv()
@@ -69,6 +67,7 @@ class AIDocsAgentService(object):
     _memory_file_path: str
     _retriever: VectorStoreRetriever
     _callback: AsyncIteratorCallbackHandler
+    _supabaseService: SupbaseService
 
     def __new__(class_, *args, **kwargs):
         if not isinstance(class_._instance, class_):
@@ -77,6 +76,7 @@ class AIDocsAgentService(object):
         return class_._instance
 
     def __init__(self):
+        self._supabaseService = SupbaseService()
         self._callback = CustomCallbackHandler()
         if not os.path.exists("./backend/.cache"):
             os.makedirs("./backend/.cache")
@@ -84,27 +84,18 @@ class AIDocsAgentService(object):
         if not os.path.exists("./backend/.cache/docs"):
             os.makedirs("./backend/.cache/docs")
 
-        if not os.path.exists("./backend/.cache/docs/embeddings"):
-            os.makedirs("./backend/.cache/docs/embeddings")
-
-        if not os.path.exists("./backend/.cache/docs/files"):
-            os.makedirs("./backend/.cache/docs/files")
-
-        if not os.path.exists("./backend/.cache/docs/chat_memory"):
-            os.makedirs("./backend/.cache/docs/chat_memory")
-
     def __init_path(self, email: str, filename: str):
         self._memory_file_path = (
-            f"./backend/.cache/docs/chat_memory/{email}/{filename}_memory.json"
+            f"./backend/.cache/docs/{email}/chat_memory/{filename}_memory.json"
         )
-        if not os.path.exists(f"./backend/.cache/docs/embeddings/{email}"):
-            os.makedirs(f"./backend/.cache/docs/embeddings/{email}")
+        if not os.path.exists(f"./backend/.cache/docs/{email}/embeddings"):
+            os.makedirs(f"./backend/.cache/docs/{email}/embeddings")
 
-        if not os.path.exists(f"./backend/.cache/docs/files/{email}"):
-            os.makedirs(f"./backend/.cache/docs/files/{email}")
+        if not os.path.exists(f"./backend/.cache/docs/{email}/files"):
+            os.makedirs(f"./backend/.cache/docs/{email}/files")
 
-        if not os.path.exists(f"./backend/.cache/docs/chat_memory/{email}"):
-            os.makedirs(f"./backend/.cache/docs/chat_memory/{email}")
+        if not os.path.exists(f"./backend/.cache/docs/{email}/chat_memory"):
+            os.makedirs(f"./backend/.cache/docs/{email}/chat_memory")
 
     def embed_file(self, email: str, file: UploadFile):
         try:
@@ -128,7 +119,7 @@ class AIDocsAgentService(object):
 
     def get_retriever(self, email: str, filename: str):
         cache_dir = LocalFileStore(
-            f"./backend/.cache/docs/embeddings/{email}/{filename}"
+            f"./backend/.cache/{email}/docs/embeddings/{filename}"
         )
         file_path = self.get_file_path(email=email, filename=filename)
         loader = UnstructuredFileLoader(file_path)
@@ -136,12 +127,19 @@ class AIDocsAgentService(object):
         cached_embeddings = CacheBackedEmbeddings.from_bytes_store(
             embeddings, cache_dir
         )
-        vectorstore = FAISS.from_documents(docs, cached_embeddings)
+        vectorstore = SupabaseVectorStore.from_documents(
+            docs,
+            cached_embeddings,
+            client=self._supabaseService.supabase,
+            table_name="Documents",
+            query_name="match_documents",
+            chunk_size=500,
+        )
         self._retriever = vectorstore.as_retriever()
         return self._retriever
 
     def get_file_path(self, email: str, filename: str):
-        return f"./backend/.cache/docs/files/{email}/{filename}"
+        return f"./backend/.cache/docs/{email}/files/{filename}"
 
     class GraphState(TypedDict):
         """

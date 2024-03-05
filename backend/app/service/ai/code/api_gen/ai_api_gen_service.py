@@ -193,6 +193,7 @@ class AICodeApiGenService(object):
             - Ensure the code is modular, easily understandable, and scalable.
             - Verify security measures, especially in user authentication and data manipulation, to prevent common vulnerabilities.
             - Do not just code comment. You should generate codes following your code comment.
+            - Do not output markdown, Output only plain text.
             
             Based on the self-evaluation, refine the prompt or generated code to better meet the project requirements, improve code quality, or enhance security and performance.
 

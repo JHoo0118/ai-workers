@@ -112,7 +112,7 @@ function AIApiGenContainer({}: AIApiGenContainerProps) {
                   <Textarea
                     {...form.register("input")}
                     name="input"
-                    placeholder={`// Example:\nCreate something that stores crypto price data in a database using docker-compose`}
+                    placeholder={`// Example:\nCreate something that stores crypto price data in a database`}
                     className="min-h-[10rem] w-full resize-none"
                   />
                 </FormControl>
