@@ -7,7 +7,7 @@ from fastapi.responses import FileResponse
 from app.model.file import *
 from app.const import file_output_dir
 from app.service.file.file_service import FileService
-from app.db.supabase import SupbaseService
+from app.db.supabase import SupabaseService
 
 router = APIRouter(
     prefix="/file",
@@ -29,7 +29,7 @@ async def is_exist_file(filename: str, email: str = None) -> IsExistFileOutputs:
     if email is None:
         fileType = "anon_" + fileType
 
-    isExist = SupbaseService().check_file_exists_on_supabase(
+    isExist = SupabaseService().check_file_exists_on_supabase(
         file_path=file_output_dir[fileType], filename=filename
     )
 
@@ -43,7 +43,7 @@ async def file_download(
     fileType = FileService().get_file_extension(filename)
     if email is None:
         fileType = "anon_" + fileType
-    tmp_file_path = SupbaseService().file_donwload_on_supabase(
+    tmp_file_path = SupabaseService().file_donwload_on_supabase(
         file_path=file_output_dir[fileType], filename=filename, ip=request.client.host
     )
     mime_type = FileService().get_file_mime_type(tmp_file_path)
@@ -62,6 +62,6 @@ async def file_delete(filename: str, email: str = None) -> bool:
         fileType = "anon_" + fileType
     tmp_file_path = f'{file_output_dir["tmp"]}/{filename}'
     FileService().delete_file(file_path=tmp_file_path)
-    return SupbaseService().delete_file_on_supabase(
+    return SupabaseService().delete_file_on_supabase(
         f"{file_output_dir[fileType]}/{filename}",
     )

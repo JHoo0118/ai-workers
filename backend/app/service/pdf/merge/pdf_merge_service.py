@@ -6,7 +6,7 @@ from typing import List
 from fastapi import UploadFile
 from pypdf import PdfWriter
 from app.const import *
-from app.db.supabase import SupbaseService
+from app.db.supabase import SupabaseService
 from app.const.const import FILE_BUCKET_NAME
 from app.db.prisma import prisma
 
@@ -34,7 +34,7 @@ def get_pdf_merge_result(files: List[UploadFile]) -> str:
         merger.write(tmp_file_path)
         merger.close()
 
-        SupbaseService().file_upload_on_supabase(
+        SupabaseService().file_upload_on_supabase(
             tmp_file_path=tmp_file_path,
             output_file_path=output_file_path,
             filename=filename,

@@ -6,5 +6,5 @@ export const metadata: Metadata = {
 };
 
 export default function PdfMergePage() {
-  return <PdfMergeContainer acceptedFileType=".pdf" />;
+  return <PdfMergeContainer acceptedFileType=".pdf" maxAllowedFileCount={10} />;
 }

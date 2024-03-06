@@ -18,7 +18,7 @@ from app.service.auth.jwt_service import JwtService
 from app.service.user.user_service import UserService
 
 from app.const.const import SIGNUP_TYPE_GOOGLE
-from app.db.supabase import SupbaseService
+from app.db.supabase import SupabaseService
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/login")
 
@@ -32,7 +32,7 @@ class SupabaseAuthService(object):
 
     _jwtService: JwtService = None
     _userService: UserService = None
-    _supabaseService: SupbaseService = None
+    _supabaseService: SupabaseService = None
 
     def __new__(class_, *args, **kwargs):
         if not isinstance(class_._instance, class_):
@@ -43,7 +43,7 @@ class SupabaseAuthService(object):
     def __init__(self) -> None:
         self._jwtService = JwtService()
         self._userService = UserService()
-        self._supabaseService = SupbaseService()
+        self._supabaseService = SupabaseService()
 
     async def authenticate_user(self, email: str, password: str) -> UserModel:
         user = await self._userService.get_user(email)

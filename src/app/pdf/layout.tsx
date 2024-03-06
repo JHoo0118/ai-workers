@@ -3,9 +3,9 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: {
     default: "PDF",
-    template: "Easy Work | %s",
+    template: "AI Workers | %s",
   },
-  description: "Easy Work",
+  description: "AI Workers",
 };
 
 export default function PdfLayout({ children }: { children: React.ReactNode }) {

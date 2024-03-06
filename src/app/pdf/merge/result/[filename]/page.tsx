@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { decodeURIComponentHelper } from "@/lib/utils/utils";
+import { cn, decodeURIComponentHelper } from "@/lib/utils/utils";
 import { fileDonwload, filePublicDelete } from "@/service/file/file";
 import { IsFileExistOutputs } from "@/types/file-types";
 import { ArrowLeftCircle, Download, Trash2Icon } from "lucide-react";
@@ -27,6 +27,9 @@ export default function PdfMergeResultPage({
   }
 
   async function onClickDeleteButton() {
+    if (data?.isExist != true) {
+      return;
+    }
     toast.promise(filePublicDelete({ filename }), {
       loading: "삭제 중...",
       success: (result: boolean) => {
@@ -46,7 +49,7 @@ export default function PdfMergeResultPage({
     const pFilename = decodeURIComponentHelper(filename);
 
     link.href = url;
-    link.download = `${pFilename.split("_")[0]}.pdf`;
+    link.download = `${pFilename}`;
     link.click();
     window.URL.revokeObjectURL(url);
   }
@@ -80,11 +83,15 @@ export default function PdfMergeResultPage({
         </div>
         <div
           onClick={onClickDeleteButton}
-          className="group relative mt-6 cursor-pointer sm:ml-10 sm:mt-0"
+          className={cn(
+            "group relative mt-6 sm:ml-10 sm:mt-0",
+            data?.isExist == true ? "cursor-pointer" : "cursor-default",
+          )}
         >
           <Button
             className="h-10 w-10 items-center justify-center rounded-full p-2 text-white transition-colors duration-150"
             variant="destructive"
+            disabled={data?.isExist != true}
           >
             <div className="absolute -bottom-6 -left-2 z-20 text-black opacity-0 transition-opacity duration-300 group-hover:opacity-100 dark:text-white sm:-top-6">
               파일 삭제

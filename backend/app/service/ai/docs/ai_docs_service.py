@@ -25,7 +25,7 @@ from langchain.retrievers.document_compressors import (
     EmbeddingsFilter,
 )
 from langchain.retrievers.contextual_compression import ContextualCompressionRetriever
-from app.db.supabase import SupbaseService
+from app.db.supabase import SupabaseService
 
 
 load_dotenv()
@@ -63,7 +63,7 @@ class AIDocsService(object):
     _memory_llm: ChatOpenAI
     _memory: ConversationSummaryBufferMemory
     _memory_file_path: str
-    _supabaseService: SupbaseService
+    _supabaseService: SupabaseService
 
     def __new__(class_, *args, **kwargs):
         if not isinstance(class_._instance, class_):
@@ -72,7 +72,7 @@ class AIDocsService(object):
         return class_._instance
 
     def __init__(self):
-        self._supabaseService = SupbaseService()
+        self._supabaseService = SupabaseService()
         self._memory_llm = ChatOpenAI(
             temperature=0.1,
             model="GPT-4 Turbo",

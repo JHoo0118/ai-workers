@@ -16,7 +16,7 @@ url: str = os.getenv("SUPABASE_URL")
 key: str = os.getenv("SUPABASE_KEY")
 
 
-class SupbaseService(object):
+class SupabaseService(object):
     _instance = None
     supabase: Client
 
@@ -49,7 +49,7 @@ class SupbaseService(object):
             with open(tmp_file_path, "rb") as file:
                 mime_type = FileService().get_file_mime_type(tmp_file_path)
                 response = (
-                    SupbaseService()
+                    SupabaseService()
                     .supabase.storage.from_(FILE_BUCKET_NAME)
                     .upload(
                         file=file,
@@ -119,6 +119,17 @@ class SupbaseService(object):
                         "id": target_file.id,
                     },
                 )
+            return True
+        except Exception as e:
+            print(e)
+            return False
+
+    def delete_all_file_on_supabase(
+        self, file_path_list: list[str], id_list: list
+    ) -> bool:
+        try:
+            self.supabase.storage.from_(FILE_BUCKET_NAME).remove(file_path_list)
+            prisma.file.delete_many(where={"id": {"in": id_list}})
             return True
         except Exception as e:
             print(e)

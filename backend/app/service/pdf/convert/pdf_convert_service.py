@@ -11,7 +11,7 @@ import prisma
 from app.const import *
 from app.service.file.file_service import FileService
 from app.const.const import FILE_BUCKET_NAME
-from app.db.supabase import SupbaseService
+from app.db.supabase import SupabaseService
 from app.db.prisma import prisma
 
 
@@ -41,7 +41,7 @@ async def get_pdf_to_word_result(files: List[UploadFile]) -> List[str]:
             parse(input_file_tmp_path, tmp_output_file_path, start=0, end=None)
             result_list.append(output_filename_except_dir)
 
-            SupbaseService().file_upload_on_supabase(
+            SupabaseService().file_upload_on_supabase(
                 tmp_file_path=tmp_output_file_path,
                 output_file_path=supabase_output_file_path,
                 filename=output_filename_except_dir,

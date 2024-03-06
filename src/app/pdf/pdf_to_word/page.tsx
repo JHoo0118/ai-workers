@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: "PDF에서 WORD로 문서 변환",
 };
 
-export default function PdfMergePage() {
+export default function PdfToWordPage() {
   return (
     <PdfToWordContainer
       acceptedFileType=".pdf"

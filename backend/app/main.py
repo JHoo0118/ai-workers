@@ -8,14 +8,14 @@ from app.api import api
 from app.db.prisma import prisma
 from app.middleware import RouterLoggingMiddleware
 
-from app.db.supabase import SupbaseService
+from app.db.supabase import SupabaseService
 
 from app.service.scheduler.scheduler_service import SchedulerService
 
 
 load_dotenv()
 
-SupbaseService()
+SupabaseService()
 
 
 @asynccontextmanager

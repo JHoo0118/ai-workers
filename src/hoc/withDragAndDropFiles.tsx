@@ -39,8 +39,8 @@ function withDragAndDropFiles<P extends DragAndDropFilesWrappedProps>(
   const Component = ({
     acceptedFileType,
     multiple = true,
-    maxAllowedFileCount = 20,
-    maxAllowedFileSize = 100, // MB
+    maxAllowedFileCount = 10,
+    maxAllowedFileSize = 50, // MB
     ...props
   }: DragAndDropFilesComponentProps) => {
     const [dragActive, setDragActive] = useState<boolean>(false);
@@ -76,20 +76,25 @@ function withDragAndDropFiles<P extends DragAndDropFilesWrappedProps>(
       if (e.target.files && e.target.files[0]) {
         const newFileList: AcceptedFile[] = [];
         const inputFiles = e.target.files;
+        let totalFileSize = files
+          .map((file) => file.file.size)
+          .reduce((acc, size) => acc + size, 0);
 
         for (let i = 0; i < inputFiles.length; i++) {
           if (
             _isOnlyAllowedSingleFile(newFileList) ||
-            _isExceedAllowedFileCount(newFileList)
+            _isExceedAllowedFileCount([...files, ...newFileList])
           ) {
             break;
           }
 
           const file: File = inputFiles![i];
+          totalFileSize += file.size;
 
           if (
             _cannotUploadFileType(file) ||
-            _isExceedAllowedFileSize(file.size)
+            _isExceedAllowedFileSize(file.size) ||
+            _isExceedAllowedTotalFileSize(totalFileSize)
           ) {
             continue;
           }
@@ -133,19 +138,25 @@ function withDragAndDropFiles<P extends DragAndDropFilesWrappedProps>(
       if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) {
         const newFileList: AcceptedFile[] = [];
         const inputFiles = e.dataTransfer.files;
+        let totalFileSize = files
+          .map((file) => file.file.size)
+          .reduce((acc, size) => acc + size, 0);
+
         for (let i = 0; i < inputFiles.length; i++) {
           if (
             _isOnlyAllowedSingleFile(newFileList) ||
-            _isExceedAllowedFileCount(newFileList)
+            _isExceedAllowedFileCount([...files, ...newFileList])
           ) {
             break;
           }
 
           const file: File = inputFiles[i];
+          totalFileSize += file.size;
 
           if (
             _cannotUploadFileType(file) ||
-            _isExceedAllowedFileSize(file.size)
+            _isExceedAllowedFileSize(file.size) ||
+            _isExceedAllowedTotalFileSize(totalFileSize)
           ) {
             continue;
           }
@@ -219,7 +230,7 @@ function withDragAndDropFiles<P extends DragAndDropFilesWrappedProps>(
     }
 
     function _isExceedAllowedFileCount(newFileList: AcceptedFile[]) {
-      if (multiple && newFileList.length === maxAllowedFileCount) {
+      if (multiple && newFileList.length + 1 > maxAllowedFileCount) {
         toast.error(
           `최대 ${maxAllowedFileCount}개의 파일만 업로드 가능합니다.`,
         );
@@ -241,7 +252,18 @@ function withDragAndDropFiles<P extends DragAndDropFilesWrappedProps>(
       const maxAllowedFileSizeBytes = maxAllowedFileSize * 1024 * 1024;
       if (fileSize > maxAllowedFileSizeBytes) {
         toast.error(
-          `크기가 ${maxAllowedFileSize}MB 이상인 파일은 업로드 불가합니다.`,
+          `크기가 ${maxAllowedFileSize}MB 이상인 파일은 업로드가 불가능 합니다.`,
+        );
+        return true;
+      }
+      return false;
+    }
+
+    function _isExceedAllowedTotalFileSize(fileSize: number) {
+      const maxAllowedFileSizeBytes = maxAllowedFileSize * 1024 * 1024;
+      if (fileSize > maxAllowedFileSizeBytes) {
+        toast.error(
+          `모든 파일 크기의 합이 ${maxAllowedFileSize}MB를 초과하지 않아야 합니다.`,
         );
         return true;
       }

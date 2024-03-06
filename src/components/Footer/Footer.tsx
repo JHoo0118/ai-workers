@@ -35,14 +35,6 @@ const Footer: React.FC = () => {
                     개인정보처리방침
                   </Link>
                 </li>
-                <li className="mt-4">
-                  <a
-                    className="text-base leading-6 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300"
-                    href="/policies/refund-policy"
-                  >
-                    취소 및 환불정책
-                  </a>
-                </li>
               </ul>
             </div>
           </div>

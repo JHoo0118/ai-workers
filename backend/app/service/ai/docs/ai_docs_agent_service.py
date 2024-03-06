@@ -27,7 +27,7 @@ from langgraph.graph import END, StateGraph
 from langchain_core.messages.base import BaseMessage
 
 
-from app.db.supabase import SupbaseService
+from app.db.supabase import SupabaseService
 
 
 load_dotenv()
@@ -67,7 +67,7 @@ class AIDocsAgentService(object):
     _memory_file_path: str
     _retriever: VectorStoreRetriever
     _callback: AsyncIteratorCallbackHandler
-    _supabaseService: SupbaseService
+    _supabaseService: SupabaseService
 
     def __new__(class_, *args, **kwargs):
         if not isinstance(class_._instance, class_):
@@ -76,7 +76,7 @@ class AIDocsAgentService(object):
         return class_._instance
 
     def __init__(self):
-        self._supabaseService = SupbaseService()
+        self._supabaseService = SupabaseService()
         self._callback = CustomCallbackHandler()
         if not os.path.exists("./backend/.cache"):
             os.makedirs("./backend/.cache")
