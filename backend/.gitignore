@@ -12,3 +12,5 @@ venv/
 *.sln
 
 .env
+.env.dev
+.env.prod
