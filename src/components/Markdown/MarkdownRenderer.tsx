@@ -10,7 +10,7 @@ interface CodeProps {
   className?: any;
   children?: any;
 }
-const markdownStyle = `dark:prose-invert prose prose-stone lg:prose-stone sm:prose-stone prose-sm sm:prose lg:prose-lg`;
+const markdownStyle = `dark:prose-invert prose prose-stone prose-sm lg:prose-lg`;
 
 const MarkdownRenderer = ({ content }: { content: string }) => {
   return (

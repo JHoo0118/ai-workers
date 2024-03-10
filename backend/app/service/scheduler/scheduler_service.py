@@ -5,6 +5,8 @@ from datetime import datetime
 from app.db.prisma import prisma
 from app.utils.datetime_utils import getNow, afterHours
 from app.db.supabase import SupabaseService
+from app.service.file.file_service import FileService
+from app.const import *
 
 
 sched = BackgroundScheduler(timezone="Asia/Seoul")
@@ -12,6 +14,7 @@ sched = BackgroundScheduler(timezone="Asia/Seoul")
 
 class SchedulerService(object):
     _instance = None
+    _tmp_usage_dir = file_output_dir["tmp_usage"]
 
     def __new__(class_, *args, **kwargs):
         if not isinstance(class_._instance, class_):
@@ -29,25 +32,32 @@ class SchedulerService(object):
     # def test():
     #     print("hey")
 
-    # # 2시간마다
-    @sched.scheduled_job("cron", hour="*/2")
+    # # 1시간마다 uploadDate가 2시간 경과된 파일 삭제
+    @sched.scheduled_job("cron", hour="*/1")
     def scheduled_job_every_two_hours():
         print("This job runs every two hours.")
 
         files = prisma.file.find_many(
             where={
                 "uploadDate": {
-                    "lte": afterHours(getNow(), 4),
+                    "lte": afterHours(getNow(), 2),
                 },
             },
         )
 
+        tmp_file_path_list = [file.tmpFilePath for file in files]
         file_path_list = [file.filePath for file in files]
         id_list = [file.id for file in files]
         if len(file_path_list) > 0:
             result = SupabaseService().delete_all_file_on_supabase(
                 file_path_list=file_path_list, id_list=id_list
             )
+
+            for tmp_file_path in tmp_file_path_list:
+                if tmp_file_path is None:
+                    continue
+                FileService().delete_file(tmp_file_path)
+
             print(f"delete result: {result}")
 
     # d + 2 < c

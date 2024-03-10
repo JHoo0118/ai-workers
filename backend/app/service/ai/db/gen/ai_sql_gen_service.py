@@ -24,7 +24,7 @@ class AISqlGenService(object):
     def __init__(self):
         self._memory_llm = ChatOpenAI(
             temperature=0.1,
-            model="gpt-4",
+            model="gpt-4-0125-preview",
         )
 
         self._memory = ConversationSummaryBufferMemory(
@@ -87,7 +87,9 @@ class AISqlGenService(object):
         )
 
         # LLM gpt-3.5-turbo gpt-4-0125-preview"
-        llm = ChatOpenAI(model_name="gpt-4", temperature=0, max_tokens=1000)
+        llm = ChatOpenAI(
+            model_name="gpt-4-0125-preview", temperature=0, max_tokens=1000
+        )
         # llm = ChatOllama(model="mistral:latest")
 
         # Chain

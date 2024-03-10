@@ -20,6 +20,7 @@ interface DragAndDropPdfProps {
   acceptedFileType: string;
   multiple?: boolean;
   sortable?: boolean;
+  loading?: boolean;
 }
 
 function DragAndDropPdf({
@@ -37,6 +38,7 @@ function DragAndDropPdf({
   acceptedFileType,
   multiple = true,
   sortable = true,
+  loading = false,
 }: DragAndDropPdfProps) {
   return (
     <form
@@ -71,7 +73,9 @@ function DragAndDropPdf({
                   )}
                 >
                   <div
-                    onClick={() => removeFile(acceptedFile.id)}
+                    onClick={
+                      loading ? () => {} : () => removeFile(acceptedFile.id)
+                    }
                     className="flex h-6 w-6 items-center justify-center rounded-full bg-gray-300 ring-2 ring-gray-500 ring-offset-2"
                   >
                     <XIcon className="h-5 w-5 text-gray-800" />

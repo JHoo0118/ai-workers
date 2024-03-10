@@ -12,6 +12,7 @@ const Footer: React.FC = () => {
               <div className="col-span-2 text-xs text-gray-500 dark:text-gray-400">
                 <Logo />
                 <br />
+                <h3 className="text-sm text-gray-400">KIMJUNGHOO</h3>
               </div>
             </div>
             <div className="grid grid-cols-1 gap-8">
@@ -20,12 +21,12 @@ const Footer: React.FC = () => {
               </h4>
               <ul className="mt-4">
                 <li>
-                  <a
+                  <Link
                     className="text-base leading-6 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300"
-                    href="/policies/terms-and-conditions"
+                    href="/policies/terms"
                   >
                     이용약관
-                  </a>
+                  </Link>
                 </li>
                 <li className="mt-4">
                   <Link
@@ -33,6 +34,14 @@ const Footer: React.FC = () => {
                     href="/policies/privacy-policy"
                   >
                     개인정보처리방침
+                  </Link>
+                </li>
+                <li className="mt-4">
+                  <Link
+                    className="text-base leading-6 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300"
+                    href="/policies/security"
+                  >
+                    데이터 프라이버시 및 보안
                   </Link>
                 </li>
               </ul>

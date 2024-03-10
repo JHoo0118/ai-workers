@@ -10,6 +10,7 @@ argon2-cffi==23.1.0
 argon2-cffi-bindings==21.2.0
 asttokens==2.4.1
 async-generator==1.10
+async-timeout==4.0.3
 attrs==23.2.0
 backoff==2.2.1
 beautifulsoup4==4.12.3
@@ -125,6 +126,7 @@ pure-eval==0.2.2
 pyasn1==0.5.1
 pycocotools==2.0.7
 pycparser==2.21
+pycryptodome==3.20.0
 pydantic==2.6.3
 pydantic_core==2.16.3
 Pygments==2.17.2
@@ -150,6 +152,7 @@ pyzmq==25.1.2
 rapidfuzz==3.6.1
 realtime==1.0.2
 redbird==0.7.1
+redis==5.0.2
 regex==2023.12.25
 requests==2.31.0
 rsa==4.9
@@ -189,6 +192,7 @@ unstructured==0.12.4
 unstructured-client==0.18.0
 unstructured-inference==0.7.23
 unstructured.pytesseract==0.3.12
+upstash-redis==1.0.0
 urllib3==2.2.0
 uvicorn==0.27.1
 wcwidth==0.2.13

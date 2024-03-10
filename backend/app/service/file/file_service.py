@@ -2,6 +2,10 @@ import os
 import mimetypes
 import pathlib
 import math
+import uuid
+import time
+
+from app.service.crypto.crypto_service import CryptoService
 
 
 class FileService(object):
@@ -39,3 +43,10 @@ class FileService(object):
             return True
         except FileNotFoundError:
             return False
+
+    def get_converted_filename(self, suffix: str, filename: str) -> str:
+        u4 = uuid.uuid4()
+        curr_ms = round(time.time() * 1000)
+        suffix = f"{suffix}-{u4}-{curr_ms}"
+        file_extension = self.get_file_extension(filename=filename)
+        return f"{suffix}.{file_extension}"

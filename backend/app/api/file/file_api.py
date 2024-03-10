@@ -44,7 +44,9 @@ async def file_download(
     if email is None:
         fileType = "anon_" + fileType
     tmp_file_path = SupabaseService().file_donwload_on_supabase(
-        file_path=file_output_dir[fileType], filename=filename, ip=request.client.host
+        file_path_include_filename=f"{file_output_dir[fileType]}/{filename}",
+        filename=filename,
+        ip=request.client.host,
     )
     mime_type = FileService().get_file_mime_type(tmp_file_path)
 

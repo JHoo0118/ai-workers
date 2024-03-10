@@ -50,7 +50,7 @@ function AIDocsSummaryContainer({
             {
               id: "0",
               role: "assistant",
-              content: "준비가 다 됐습니다. 이제 질문해 주세요.",
+              content: "준비가 완료되었습니다. 이제 질문해 주세요.",
             },
           ]);
           setCompletedFile(true);

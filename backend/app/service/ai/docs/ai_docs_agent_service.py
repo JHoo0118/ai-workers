@@ -1,13 +1,12 @@
-import asyncio
 import os
 import json
-import operator
-import json
+import shutil
 
 from pyparsing import Any
 from typing import Dict, List, TypedDict
 from dotenv import load_dotenv
-from fastapi import UploadFile
+from fastapi import HTTPException, UploadFile, status
+from upstash_redis import Redis
 from langchain import hub
 from langchain.output_parsers.openai_tools import PydanticToolsParser
 from langchain.prompts import PromptTemplate
@@ -15,23 +14,33 @@ from langchain.callbacks import AsyncIteratorCallbackHandler
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.pydantic_v1 import BaseModel, Field
 from langchain_core.utils.function_calling import convert_to_openai_tool
+from langchain_community.chat_message_histories.upstash_redis import (
+    UpstashRedisChatMessageHistory,
+)
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_community.document_loaders import UnstructuredFileLoader
+from langchain.storage.upstash_redis import UpstashRedisByteStore
+from langchain_community.vectorstores.supabase import SupabaseVectorStore
 from langchain.embeddings import CacheBackedEmbeddings
-from langchain.storage import LocalFileStore
 from langchain.memory import ConversationSummaryBufferMemory
 from langchain.text_splitter import CharacterTextSplitter
 from langchain_core.vectorstores import VectorStoreRetriever
 from langchain_community.vectorstores.supabase import SupabaseVectorStore
 from langgraph.graph import END, StateGraph
 from langchain_core.messages.base import BaseMessage
+from app.service.file.file_service import FileService
+from app.db.prisma import prisma
+from app.const import *
 
 
 from app.db.supabase import SupabaseService
 
 
 load_dotenv()
-
+PREFIX = "docs-summary"
+UPSTASH_REDIS_REST_URL = os.getenv("UPSTASH_REDIS_REST_URL")
+UPSTASH_REDIS_REST_TOKEN = os.getenv("UPSTASH_REDIS_REST_TOKEN")
+redis_client = Redis(url=UPSTASH_REDIS_REST_URL, token=UPSTASH_REDIS_REST_TOKEN)
 splitter = CharacterTextSplitter.from_tiktoken_encoder(
     separator="\n",
     chunk_size=600,
@@ -62,84 +71,156 @@ class CustomCallbackHandler(AsyncIteratorCallbackHandler):
 
 class AIDocsAgentService(object):
     _instance = None
-    _memory_llm: ChatOpenAI
-    _memory: ConversationSummaryBufferMemory
-    _memory_file_path: str
     _retriever: VectorStoreRetriever
     _callback: AsyncIteratorCallbackHandler
     _supabaseService: SupabaseService
+    _fileService: FileService
+    _tmp_dir = file_output_dir["tmp"]
+    _tmp_usage_dir = file_output_dir["tmp_usage"]
+    _base_output_dir = file_output_dir["private_ai"]
 
-    def __new__(class_, *args, **kwargs):
+    def __new__(class_, email, *args, **kwargs):
         if not isinstance(class_._instance, class_):
             class_._instance = object.__new__(class_, *args, **kwargs)
 
         return class_._instance
 
-    def __init__(self):
+    def __init__(self, email, *args, **kwargs):
         self._supabaseService = SupabaseService()
-        self._callback = CustomCallbackHandler()
-        if not os.path.exists("./backend/.cache"):
-            os.makedirs("./backend/.cache")
+        self._fileService = FileService()
 
-        if not os.path.exists("./backend/.cache/docs"):
-            os.makedirs("./backend/.cache/docs")
+        # history = UpstashRedisChatMessageHistory(
+        #     url=UPSTASH_REDIS_REST_URL,
+        #     token=UPSTASH_REDIS_REST_TOKEN,
+        #     session_id=email,
+        #     ttl=0,
+        #     key_prefix=f"{PREFIX}-{email}",
+        # )
+        os.makedirs(self._tmp_dir, exist_ok=True)
+        os.makedirs(self._tmp_usage_dir, exist_ok=True)
 
-    def __init_path(self, email: str, filename: str):
-        self._memory_file_path = (
-            f"./backend/.cache/docs/{email}/chat_memory/{filename}_memory.json"
+    def __init_path(self, email: str):
+        os.makedirs(f"{self._tmp_usage_dir}/{email}/docs", exist_ok=True)
+
+    def get_supabase_output_file_path(self, email: str, filename: str):
+        return f"{self._base_output_dir}/{email}/docs/{filename}"
+
+    def get_tmp_output_file_path(self, filename: str):
+        return f"{self._tmp_dir}/{filename}"
+
+    def embed_file(
+        self,
+        email: str,
+        file: UploadFile,
+        ip: str,
+        jwt: str,
+    ):
+        file_content = file.file.read()
+        filename = file.filename
+        dest = f"{self._tmp_usage_dir}/{email}/docs"
+        pFilename = self._fileService.get_converted_filename(
+            suffix=PREFIX,
+            filename=filename,
         )
-        if not os.path.exists(f"./backend/.cache/docs/{email}/embeddings"):
-            os.makedirs(f"./backend/.cache/docs/{email}/embeddings")
-
-        if not os.path.exists(f"./backend/.cache/docs/{email}/files"):
-            os.makedirs(f"./backend/.cache/docs/{email}/files")
-
-        if not os.path.exists(f"./backend/.cache/docs/{email}/chat_memory"):
-            os.makedirs(f"./backend/.cache/docs/{email}/chat_memory")
-
-    def embed_file(self, email: str, file: UploadFile):
+        tmp_usage_file_path = f"{dest}/{pFilename}"
         try:
-            file_content = file.file.read()
-            filename = file.filename
-            self.__init_path(email=email, filename=filename)
-            # self._memory.clear()
-            if not os.path.exists(self._memory_file_path):
-                with open(self._memory_file_path, "a+") as file:
-                    file.write("{}")
-                    file.close()
-            # self.load_memory_from_file(self._memory_file_path)
-            file_path = self.get_file_path(email=email, filename=filename)
+            self.__init_path(email=email)
 
-            with open(file_path, "wb") as f:
+            tmp_output_file_path = self.get_tmp_output_file_path(filename=pFilename)
+            supabase_output_file_path = self.get_supabase_output_file_path(
+                email, pFilename
+            )
+
+            with open(tmp_output_file_path, "wb") as f:
                 f.write(file_content)
 
-            return self.get_retriever(email=email, filename=filename)
-        except FileNotFoundError as e:
+            shutil.copyfile(f"{tmp_output_file_path}", tmp_usage_file_path)
+            SupabaseService().file_upload_on_supabase_private(
+                tmp_file_path=tmp_output_file_path,
+                tmp_usage_file_path=tmp_usage_file_path,
+                output_file_path=supabase_output_file_path,
+                filename=pFilename,
+                originFilename=filename,
+                email=email,
+                jwt=jwt,
+            )
+            self._fileService.delete_file(tmp_output_file_path)
+
+            return self.get_retriever(email=email, filename=filename, ip=ip)
+        except Exception as e:
+            self._fileService.delete_file(tmp_output_file_path)
+            self._fileService.delete_file(tmp_usage_file_path)
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="문서 요약 중 오류가 발생했습니다.",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+
+    def get_retriever(self, email: str, filename: str, ip: str):
+
+        file = prisma.file.find_first_or_raise(
+            order={
+                "uploadDate": "desc",
+            },
+            where={"userEmail": email, "originFilename": filename},
+        )
+
+        pFilename = file.filename
+        try:
+            tmp_usage_path = f"{self._tmp_usage_dir}/{email}/docs/{pFilename}"
+            self.download_file_from_supabase(
+                email=email, tmp_usage_path=tmp_usage_path, filename=pFilename, ip=ip
+            )
+
+            cache_dir = UpstashRedisByteStore(
+                client=redis_client,
+                ttl=60 * 3600 * 2,
+                namespace=f"{PREFIX}-{pFilename}-{email}",
+            )
+            loader = UnstructuredFileLoader(tmp_usage_path)
+            docs = loader.load_and_split(text_splitter=splitter)
+            cached_embeddings = CacheBackedEmbeddings.from_bytes_store(
+                embeddings, cache_dir
+            )
+
+            vectorstore = SupabaseVectorStore.from_documents(
+                docs,
+                cached_embeddings,
+                client=self._supabaseService.supabase,
+                table_name="Documents",
+                query_name="match_documents",
+                chunk_size=500,
+            )
+            self._retriever = vectorstore.as_retriever()
+            return self._retriever
+        except Exception as e:
             print(e)
+            tmp_usage_path = f"{self._tmp_usage_dir}/{email}/docs/{pFilename}"
+            self._fileService.delete_file(tmp_usage_path)
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="문서 요약 중 오류가 발생했습니다.",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
 
-    def get_retriever(self, email: str, filename: str):
-        cache_dir = LocalFileStore(
-            f"./backend/.cache/{email}/docs/embeddings/{filename}"
-        )
-        file_path = self.get_file_path(email=email, filename=filename)
-        loader = UnstructuredFileLoader(file_path)
-        docs = loader.load_and_split(text_splitter=splitter)
-        cached_embeddings = CacheBackedEmbeddings.from_bytes_store(
-            embeddings, cache_dir
-        )
-        vectorstore = SupabaseVectorStore.from_documents(
-            docs,
-            cached_embeddings,
-            client=self._supabaseService.supabase,
-            table_name="Documents",
-            query_name="match_documents",
-            chunk_size=500,
-        )
-        self._retriever = vectorstore.as_retriever()
-        return self._retriever
+    def download_file_from_supabase(
+        self,
+        email: str,
+        tmp_usage_path: str,
+        filename: str,
+        ip: str,
+    ) -> None:
+        if not os.path.exists(tmp_usage_path):
+            supabase_file_path = self.get_supabase_output_file_path(email, filename)
+            SupabaseService().file_donwload_on_supabase(
+                file_path_include_filename=supabase_file_path,
+                filename=filename,
+                ip=ip,
+                tmp_file_path=tmp_usage_path,
+            )
 
-    def get_file_path(self, email: str, filename: str):
-        return f"./backend/.cache/docs/{email}/files/{filename}"
+        else:
+            print(f"File already downloaded. Using cached version at {tmp_usage_path}")
 
     class GraphState(TypedDict):
         """
@@ -490,9 +571,9 @@ class AIDocsAgentService(object):
             print("---DECISION: NOT USEFUL---")
             return "not useful"
 
-    async def invoke_chain(self, email: str, filename: str, message: str):
-        self.__init_path(email=email, filename=filename)
-        self.get_retriever(email=email, filename=filename)
+    async def invoke_chain(self, email: str, filename: str, message: str, ip: str):
+        self.__init_path(email=email)
+        self.get_retriever(email=email, filename=filename, ip=ip)
         workflow = StateGraph(self.GraphState)
 
         # Define the nodes

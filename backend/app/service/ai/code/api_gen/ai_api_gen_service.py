@@ -79,7 +79,7 @@ class AICodeApiGenService(object):
         )
 
         # LLM gpt-4-0125-preview
-        llm = ChatOpenAI(model_name="gpt-4", temperature=0)
+        llm = ChatOpenAI(model_name="gpt-4-0125-preview", temperature=0)
         # llm = ChatOllama(model="mistral:latest")
 
         # Chain
@@ -140,7 +140,7 @@ class AICodeApiGenService(object):
         )
 
         # LLM
-        llm = ChatOpenAI(model_name="gpt-4", temperature=0)
+        llm = ChatOpenAI(model_name="gpt-4-0125-preview", temperature=0)
         # llm = ChatOllama(model="mistral:latest")
 
         # Chain
@@ -203,7 +203,7 @@ class AICodeApiGenService(object):
             input_variables=["input", "framework", "project_scope"],
         )
         # LLM
-        llm = ChatOpenAI(model_name="gpt-4", temperature=0)
+        llm = ChatOpenAI(model_name="gpt-4-0125-preview", temperature=0)
         # llm = ChatOllama(model="mistral:latest")
 
         # Chain

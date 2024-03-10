@@ -38,6 +38,7 @@ def get_pdf_merge_result(files: List[UploadFile]) -> str:
             tmp_file_path=tmp_file_path,
             output_file_path=output_file_path,
             filename=filename,
+            originFilename=filename,
         )
         return filename
     except:

@@ -1,5 +1,6 @@
 import mimetypes
 import os
+import re
 
 from dotenv import load_dotenv
 from fastapi import HTTPException, status
@@ -19,6 +20,8 @@ key: str = os.getenv("SUPABASE_KEY")
 class SupabaseService(object):
     _instance = None
     supabase: Client
+    # pattern: str = r"^(\w|\/|!|-|\*|\'|\(|\)| |&|\$|@|=|;|:|\+|,|\?)*$"
+    # pattern: str = r"[!@#$%^&*()\/_=:\+,\?\'\"\[\]\{\}\|\`]"
 
     def __new__(class_, *args, **kwargs):
         if not isinstance(class_._instance, class_):
@@ -44,6 +47,7 @@ class SupabaseService(object):
         tmp_file_path: str,
         output_file_path: str,
         filename: str,
+        originFilename: str,
     ):
         try:
             with open(tmp_file_path, "rb") as file:
@@ -64,7 +68,9 @@ class SupabaseService(object):
 
                 prisma.file.create(
                     data={
-                        "fileName": filename,
+                        "filename": filename,
+                        "tmpFilePath": tmp_file_path,
+                        "originFilename": originFilename,
                         "filePath": output_file_path,
                         "fileSize": file_size,
                         "contentType": mime_type,
@@ -73,10 +79,61 @@ class SupabaseService(object):
         except Exception as e:
             print(e)
 
-    def file_donwload_on_supabase(self, file_path: str, filename: str, ip: str) -> str:
+    def file_upload_on_supabase_private(
+        self,
+        tmp_file_path: str,
+        output_file_path: str,
+        filename: str,
+        originFilename: str,
+        email: str,
+        jwt: str,
+        tmp_usage_file_path: str = None,
+    ):
+        try:
+            with open(tmp_file_path, "rb") as file:
+                mime_type = FileService().get_file_mime_type(tmp_file_path)
+                response = (
+                    SupabaseService()
+                    .supabase.storage.from_(FILE_BUCKET_NAME)
+                    .upload(
+                        file=file,
+                        path=output_file_path,
+                        file_options={
+                            "content-type": mime_type,
+                        },
+                    )
+                )
+                file_size = FileService().get_file_size(tmp_file_path)
+                FileService().delete_file(tmp_file_path)
+
+                if tmp_usage_file_path is None:
+                    tmp_usage_file_path = tmp_file_path
+
+                prisma.file.create(
+                    data={
+                        "filename": filename,
+                        "tmpFilePath": tmp_usage_file_path,
+                        "originFilename": originFilename,
+                        "filePath": output_file_path,
+                        "fileSize": file_size,
+                        "contentType": mime_type,
+                        "User": {"connect": {"email": email}},
+                    }
+                )
+        except Exception as e:
+            print(e)
+
+    def file_donwload_on_supabase(
+        self,
+        file_path_include_filename: str,
+        filename: str,
+        ip: str,
+        tmp_file_path: str = None,
+    ) -> str:
         tmp_dir = file_output_dir["tmp"]
-        tmp_file_path = f"{tmp_dir}/{filename}"
-        target_file_path = f"{file_path}/{filename}"
+        if tmp_file_path is None:
+            tmp_file_path = f"{tmp_dir}/{filename}"
+        target_file_path = file_path_include_filename
 
         no_content_exception = HTTPException(
             status_code=status.HTTP_204_NO_CONTENT,
@@ -84,15 +141,30 @@ class SupabaseService(object):
         )
 
         try:
+            target_file = prisma.file.find_first(where={"filePath": target_file_path})
+            if target_file is None:
+                raise no_content_exception
+
+            if target_file.tmpFilePath is not None and os.path.exists(
+                target_file.tmpFilePath
+            ):
+                prisma.downloadlog.create(
+                    data={
+                        "File": {
+                            "connect": {
+                                "id": target_file.id,
+                            }
+                        },
+                        "userIP": ip,
+                    }
+                )
+                return target_file.tmpFilePath
+
             with open(tmp_file_path, "wb+") as f:
                 res = self.supabase.storage.from_(FILE_BUCKET_NAME).download(
                     target_file_path
                 )
                 f.write(res)
-
-            target_file = prisma.file.find_first(where={"filePath": target_file_path})
-            if target_file is None:
-                raise no_content_exception
 
             prisma.downloadlog.create(
                 data={
@@ -134,3 +206,6 @@ class SupabaseService(object):
         except Exception as e:
             print(e)
             return False
+
+    # def replace_key_for_validation(self, key: str) -> bool:
+    #     return re.sub(self.pattern, "", key)

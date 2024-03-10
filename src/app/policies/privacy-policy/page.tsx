@@ -5,7 +5,7 @@ export default function PrivacyPolicyPage() {
     <div className="mx-auto w-full max-w-[60rem]">
       <section className="flex w-full flex-col items-center py-40">
         <h3 className="underline">법률 & 개인 정보 보호</h3>
-        <h1 className="mb-8 mt-4 text-6xl font-bold">개인정보처리방침</h1>
+        <h1 className="mb-8 mt-4 text-6xl font-bold">이용약관</h1>
         <p className="text-center text-lg">
           AI Workers가 사용자의 데이터를 관리하는 방법을 명확히 이해하려면
           개인정보처리방침을 읽어 보세요. AI Workers는 투명성을 최우선시하여
@@ -15,7 +15,7 @@ export default function PrivacyPolicyPage() {
           <MarkdownRenderer
             content={`
 ## 1. 수집하는 개인정보 항목 및 수집 방법
-* 수집하는 개인정보의 항목: 저희 웹사이트는 서비스 제공을 위해 최소한의 개인정보만을 수집합니다. 주로 수집하는 정보는 다음과 같습니다:
+* 수집하는 개인정보의 항목: AI Workers 웹사이트는 서비스 제공을 위해 최소한의 개인정보만을 수집합니다. 주로 수집하는 정보는 다음과 같습니다:
   * 이메일 주소
   * 기타 서비스 이용 과정에서 사용자가 자발적으로 제공하는 개인정보
 * 개인정보 수집 방법: AI Worker는 다음과 같은 방법으로 개인정보를 수집합니다.
@@ -47,6 +47,12 @@ AI Workers는 개인정보 보유 기간의 경과, 처리 목적 달성 등 개
 
 ## 6. 개인정보 처리에 관한 추가 정보
 **AI Workers에 업로드된 모든 파일은 처리 후 2시간 후(사용자가 즉시 삭제 가능)에 서버에서 삭제됩니다.**
+
+## 7. 고지의 의무
+서비스의 개선 혹은 목적에 따라 개인정보 취급방침에 변경사항이 생길 수 있습니다. AI Workers는 개인정보처리방침이 변경되는 경우에는 AI Workers의 사이트 혹은 이메일을 통하여 변경 및 시행의 시기, 변경 내용을 공지합니다. AI Workers는 변경 사항을 게시하며, 변경된 게시정보처리방침은 게시한 날로부터 7일 이후에 효력이 발생하게 됩니다. 단, "회원"의 권리에 중요한 변경이 있을 경우에는 변경될 내용을 30일 이전에 미리 알립니다.
+
+공고일자 : 2024년 3월 7일
+시행일자 : 2023년 3월 14일
 `}
           />
         </div>

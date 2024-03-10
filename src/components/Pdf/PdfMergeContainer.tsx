@@ -86,6 +86,7 @@ function PdfMergeContainer({
         handleDragEnter={handleDragEnter}
         removeFile={removeFile}
         acceptedFileType={acceptedFileType}
+        loading={loading}
         sideBarContent={
           <div className="flex h-full flex-col justify-between px-4 py-2">
             <div>

@@ -45,6 +45,7 @@ async def get_pdf_to_word_result(files: List[UploadFile]) -> List[str]:
                 tmp_file_path=tmp_output_file_path,
                 output_file_path=supabase_output_file_path,
                 filename=output_filename_except_dir,
+                originFilename=output_filename_except_dir,
             )
 
             FileService().delete_file(input_file_tmp_path, missing_ok=True)

@@ -42,7 +42,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const router = useRouter();
 
   const getUser = useCallback(async () => {
-    console.log(hasCookie(ACCESS_TOKEN));
     if (hasCookie(ACCESS_TOKEN)) {
       const user = await getMe();
 
